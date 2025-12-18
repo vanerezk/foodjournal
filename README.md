@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Food Journal
 
-## Getting Started
+Aplicación web para registrar restaurantes y comidas, con estadísticas y visualizaciones, diseñada para escritorio y móvil.
 
-First, run the development server:
+✅ Características principales:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Añadir/editar/eliminar entradas de comidas (lugar, ciudad, país, tipo de comida, notas, fecha).
+- Seleccionar tipo de servicio: Comer aquí o Delivery y visualizarlo en gráfico.
+- Estadísticas interactivas: gráficos tipo pie, bar y time-series (entradas por mes).
+- Filtros por país, tipo de comida, valoración y rangos de fecha.
+- Persistencia local con localStorage (clave: food-journal-v2).
+- Interfaz responsiva optimizada para dispositivos móviles (menús, botones táctiles, vista numérica de entradas por mes).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🧰 Tecnologías:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js 16 (Turbopack), React 19
+- Bootstrap 5 (UI), react-window (virtualized lists)
+- TypeScript, ESLint, Playwright (devtools)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Almacenamiento local
 
-## Learn More
+La app guarda tus entradas **localmente** en el navegador usando `localStorage` bajo la clave `food-journal-v2`.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Los controles de exportar/importar fueron ocultados en la interfaz para simplificar la experiencia. Si quieres que vuelva a añadirse una forma visible de exportar o importar archivos, dímelo y la reintroduzco.
