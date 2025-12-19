@@ -8,6 +8,7 @@ export default function Home() {
       
       <div className="container-main">
         <FoodJournalV2 />
+        <h1>HOLA</h1>
       </div>
     </>
   );
