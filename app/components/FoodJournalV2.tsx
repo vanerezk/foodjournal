@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 
 
@@ -16,6 +17,8 @@ type Entry = {
   rating?: Rating;
   serviceType?: "dine-in" | "delivery"; // nuevo: tipo de servicio
   notes?: string;
+  maps_url?: string;
+  photos?: string[];
 };
 
 const DEFAULT_CUISINES = ["Mexicana", "Italiana", "Japonesa", "China", "India", "Española", "Peruana", "Argentina", "Tailandesa", "Coreana", "Griega", "Turca", "Mediterránea", "Vegetariana", "Vegana", "Francesa", "Americana", "Otra"];
@@ -158,7 +161,14 @@ function LineChart({ data, width = 1250, height = 160 }: { data: { label: string
 }
 
 export default function FoodJournalV2() {
-  const [entries, setEntries] = useState<Entry[]>([]);
+  const [entries, setEntries] = useState<Entry[]>(() => {
+    try {
+      const raw = localStorage.getItem("food-journal-v2");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
 
   // Form state
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -213,11 +223,6 @@ export default function FoodJournalV2() {
   }, []);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("food-journal-v2");
-      if (raw) setEntries(JSON.parse(raw));
-    } catch {}
-
     // Load persisted active tab
     try {
       const t = localStorage.getItem("food-journal-active-tab");
@@ -695,7 +700,7 @@ export default function FoodJournalV2() {
                         <div style={{ cursor: 'grab', padding: 6, borderRadius: 4, background: '#f5f5f5' }}>≡</div>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div>{e.place}</div>
+                            <Link href={`/entry/${e.id}`} style={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', fontWeight: 600 }}>{e.place}</Link>
                             {e.city && (
                               <button type="button" aria-label={"Filtrar por ciudad " + e.city} className="badge bg-secondary" style={{ fontSize: '0.75rem', border: 'none', cursor: 'pointer' }} onClick={() => { setSearch(e.city || ''); setFilterCountry('Todas'); setFilterRating('Todas'); setActiveTab('history'); }}>{e.city}</button>
                             )}
