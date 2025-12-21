@@ -612,25 +612,25 @@ export default function FoodJournalV2() {
     <div className="card-like">
       <h2 style={{ marginTop: 0 }}>Food Journal 2026</h2>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
-        <div>
+      <div className="entry-form-grid">
+        <div className="form-field-date">
           <label style={{ display: "block", marginBottom: 6 }}>Fecha</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{ width: "100%", padding: 10 }} />
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{ width: "100%", padding: 8, boxSizing: "border-box" }} />
         </div>
-        <div>
+        <div className="form-field-place">
           <label style={{ display: "block", marginBottom: 6 }}>Lugar</label>
           <input value={place} onChange={(e) => setPlace(e.target.value)} placeholder="Nombre del lugar" style={{ width: "100%", padding: 8 }} />
         </div>
-        <div>
+        <div className="form-field-city">
           <label style={{ display: "block", marginBottom: 6 }}>Ciudad (opcional)</label>
           <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ciudad" style={{ width: "100%", padding: 8 }} />
         </div>
-        <div>
+        <div className="form-field-country">
           <label style={{ display: "block", marginBottom: 6 }}>País</label>
           <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="País" style={{ width: "100%", padding: 8 }} />
         </div>
 
-        <div style={{ gridColumn: "1 / -1" }}>
+        <div className="form-field-cuisine">
           <label style={{ display: "block", marginBottom: 6 }}>Tipo de comida</label>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <select value={cuisine} onChange={(e) => setCuisine(e.target.value)} style={{ flex: '1 1 200px', padding: 8 }}>
@@ -642,13 +642,13 @@ export default function FoodJournalV2() {
           </div>
         </div>
         {cuisine === "Otra" && (
-          <div style={{ gridColumn: "1 / -1" }}>
+          <div className="form-field-custom-cuisine">
             <label style={{ display: "block", marginBottom: 6 }}>Especificar tipo</label>
             <input value={customCuisine} onChange={(e) => setCustomCuisine(e.target.value)} placeholder="Ej: Peruana" style={{ width: "100%", padding: 8 }} />
           </div>
         )}
 
-        <div style={{ gridColumn: "1 / -1" }}>
+        <div className="form-field-service">
           <label style={{ display: "block", marginBottom: 6 }}>Tipo de servicio</label>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <button type="button" onClick={() => setServiceType("dine-in")} className={`btn ${serviceType === "dine-in" ? "btn-primary" : "btn-outline-primary"}`} style={{ flex: '1 1 140px' }}>🍽️ Comer aquí</button>
@@ -656,12 +656,12 @@ export default function FoodJournalV2() {
           </div>
         </div>
 
-        <div style={{ gridColumn: "1 / -1" }}>
+        <div className="form-field-notes">
           <label style={{ display: "block", marginBottom: 6 }}>Notas (opcional)</label>
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Comentario breve" rows={3} style={{ width: "100%", padding: 8 }} />
         </div>
 
-        <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <div className="form-field-actions">
           <button onClick={addOrUpdate} className="btn btn-primary btn-sm">{editingId ? "Guardar" : "Añadir"}</button>
           <button onClick={resetForm} className="btn btn-secondary btn-sm">Limpiar</button>
 
