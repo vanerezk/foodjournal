@@ -361,23 +361,23 @@ export default function FoodJournalV2() {
       if (supabase) {
         try {
           console.log('Supabase inserting:', { id: newEntry.id, place: newEntry.place });
-          const { data, error } = await supabase.from('entries').insert([{
+          const { data, error } = await supabase.from('entries').upsert({
             id: newEntry.id,
             date: newEntry.date,
             place: newEntry.place,
-            city: newEntry.city,
+            city: newEntry.city || null,
             country: newEntry.country,
             cuisine: newEntry.cuisine,
-            service_type: newEntry.serviceType,
-            notes: newEntry.notes,
+            service_type: newEntry.serviceType || null,
+            notes: newEntry.notes || null,
             rating: newEntry.rating,
             maps_url: newEntry.maps_url || null,
             photos: newEntry.photos || []
-          }]);
+          });
           if (error) {
             console.error('Supabase insert error:', error);
           } else {
-            console.log('Supabase insert success:', data);
+            console.log('Supabase insert success');
           }
         } catch (err) { console.error('Could not insert into Supabase', err); }
       } else {
