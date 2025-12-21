@@ -34,6 +34,7 @@ Cada entrada del historial puede abrirse como una **ficha individual** haciendo 
 - **Guardar una URL de Google Maps** y ver el mapa embebido (Share → Embed en Google Maps).
 
 Para embeber un mapa desde Google Maps:
+
 1. Abre Google Maps y busca el lugar.
 2. Haz clic en "Compartir" (o el icono de compartir).
 3. Selecciona "Insertar un mapa".
@@ -42,12 +43,24 @@ Para embeber un mapa desde Google Maps:
 
 ---
 
-## Supabase (backend opcional — futuro)
+## Supabase (backend en la nube) ☁️
 
-Si en el futuro quieres migrar a una base de datos en la nube (Supabase), el proyecto tiene la estructura preparada. Por ahora todo funciona con `localStorage` — no es necesario configurar Supabase para usar la app. 
+**¡La app ahora está totalmente integrada con Supabase!** Funciona con:
 
-Cuando decidas usarlo:
-- Crea un proyecto en https://app.supabase.com/.
-- Ejecuta el SQL de `supabase/init.sql` en el editor SQL.
-- Crea un bucket `entries` para las fotos.
-- Configura `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` en Vercel (o `.env.local` para desarrollo local).
+- **Base de datos Supabase**: Sincronización automática de todas las entradas entre dispositivos
+- **Supabase Storage**: Las fotos se suben a la nube y se obtienen URLs públicas
+- **Fallback a localStorage**: Si Supabase no está disponible, la app sigue funcionando localmente
+
+### Configuración:
+
+📋 **[Ver guía completa de configuración en SUPABASE_SETUP.md](SUPABASE_SETUP.md)**
+
+Pasos rápidos:
+
+1. ✅ **Tabla creada**: Ya tienes la tabla `entries` en Supabase
+2. 📂 **Crear bucket de Storage**: Ve a Storage → New bucket → Nombre: `entries` (público)
+3. 🔑 **Variables de entorno configuradas**: Ya tienes las keys en Vercel
+4. 🔄 **Migrar datos existentes**: Si tienes entradas en localStorage, usa el script de migración en la guía
+5. ✅ **Probar sincronización**: Crea una entrada, sube fotos, verifica en Supabase
+
+La app carga datos de Supabase primero, y si falla usa localStorage. Al guardar, sincroniza con Supabase y mantiene localStorage como respaldo.

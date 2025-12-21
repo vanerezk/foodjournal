@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '../../../lib/supabaseClient';
 
 type Entry = {
   id: string;
@@ -30,30 +31,74 @@ export default function EntryClient({ id }: { id: string }) {
 
   useEffect(() => {
     let mounted = true;
-    try {
-      const raw = localStorage.getItem('food-journal-v2');
-      if (raw) {
-        const arr = JSON.parse(raw) as any[];
-        const found = arr.find((x) => x.id === id);
-        if (found && mounted) {
-          setEntry(found);
-          setMapsUrl(found.maps_url || '');
-          setEditData({
-            date: found.date,
-            place: found.place,
-            city: found.city || '',
-            country: found.country,
-            cuisine: found.cuisine,
-            serviceType: found.serviceType || 'dine-in',
-            notes: found.notes || ''
-          });
+    
+    const loadEntry = async () => {
+      try {
+        // Try loading from Supabase first
+        if (supabase) {
+          const { data, error } = await supabase
+            .from('entries')
+            .select('*')
+            .eq('id', id)
+            .single();
+          
+          if (!error && data && mounted) {
+            const entry: Entry = {
+              id: data.id,
+              date: data.date,
+              place: data.place,
+              city: data.city,
+              country: data.country,
+              cuisine: data.cuisine,
+              serviceType: data.service_type,
+              notes: data.notes,
+              rating: data.rating,
+              maps_url: data.maps_url,
+              photos: data.photos || []
+            };
+            setEntry(entry);
+            setMapsUrl(entry.maps_url || '');
+            setEditData({
+              date: entry.date,
+              place: entry.place,
+              city: entry.city || '',
+              country: entry.country,
+              cuisine: entry.cuisine,
+              serviceType: entry.serviceType || 'dine-in',
+              notes: entry.notes || ''
+            });
+            if (mounted) setLoading(false);
+            return;
+          }
         }
+        
+        // Fallback to localStorage
+        const raw = localStorage.getItem('food-journal-v2');
+        if (raw) {
+          const arr = JSON.parse(raw) as any[];
+          const found = arr.find((x) => x.id === id);
+          if (found && mounted) {
+            setEntry(found);
+            setMapsUrl(found.maps_url || '');
+            setEditData({
+              date: found.date,
+              place: found.place,
+              city: found.city || '',
+              country: found.country,
+              cuisine: found.cuisine,
+              serviceType: found.serviceType || 'dine-in',
+              notes: found.notes || ''
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Error loading entry', err);
+      } finally {
+        if (mounted) setLoading(false);
       }
-    } catch (err) {
-      console.error('Error loading entry from localStorage', err);
-    } finally {
-      if (mounted) setLoading(false);
-    }
+    };
+    
+    loadEntry();
 
     return () => { mounted = false; };
   }, [id]);
@@ -68,51 +113,101 @@ export default function EntryClient({ id }: { id: string }) {
     
     setUploading(true);
     const uploadedUrls: string[] = [];
+    
     try {
-      // Simple approach: convert images to base64 and store in localStorage
-      for (let i = 0; i < files.length; i++) {
-        const f = files[i];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const base64 = e.target?.result as string;
-          uploadedUrls.push(base64);
+      if (supabase) {
+        // Upload to Supabase Storage
+        for (let i = 0; i < files.length; i++) {
+          const f = files[i];
+          const fileName = `${entry.id}/${Date.now()}-${f.name.replace(/[^a-zA-Z0-9.\-]/g, '_')}`;
           
-          if (uploadedUrls.length === files.length) {
-            // All files processed, update entry
-            const newPhotos = [...(entry.photos || []), ...uploadedUrls];
-            const updated = { ...entry, photos: newPhotos };
-            setEntry(updated);
-            
-            // Update localStorage
-            try {
-              const raw = localStorage.getItem('food-journal-v2');
-              if (raw) {
-                const arr = JSON.parse(raw) as any[];
-                const ix = arr.findIndex((x) => x.id === entry.id);
-                if (ix !== -1) {
-                  arr[ix].photos = newPhotos;
-                  localStorage.setItem('food-journal-v2', JSON.stringify(arr));
-                }
-              }
-            } catch {}
-            setFiles(null);
-            setUploading(false);
+          const { data, error } = await supabase.storage
+            .from('entries')
+            .upload(fileName, f, { upsert: false });
+          
+          if (error) throw error;
+          
+          // Get public URL
+          const { data: publicData } = supabase.storage
+            .from('entries')
+            .getPublicUrl(fileName);
+          
+          if (publicData?.publicUrl) uploadedUrls.push(publicData.publicUrl);
+        }
+        
+        // Update entry with new photos array
+        const newPhotos = [...(entry.photos || []), ...uploadedUrls];
+        const updated = { ...entry, photos: newPhotos };
+        setEntry(updated);
+        
+        // Update Supabase database
+        await supabase.from('entries').update({ photos: newPhotos }).eq('id', entry.id);
+        
+        // Update localStorage as backup
+        try {
+          const raw = localStorage.getItem('food-journal-v2');
+          if (raw) {
+            const arr = JSON.parse(raw) as any[];
+            const ix = arr.findIndex((x) => x.id === entry.id);
+            if (ix !== -1) {
+              arr[ix].photos = newPhotos;
+              localStorage.setItem('food-journal-v2', JSON.stringify(arr));
+            }
           }
-        };
-        reader.readAsDataURL(f);
+        } catch {}
+        
+        setFiles(null);
+      } else {
+        // Fallback to base64 if Supabase not configured
+        for (let i = 0; i < files.length; i++) {
+          const f = files[i];
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64 = e.target?.result as string;
+            uploadedUrls.push(base64);
+            
+            if (uploadedUrls.length === files.length) {
+              const newPhotos = [...(entry.photos || []), ...uploadedUrls];
+              const updated = { ...entry, photos: newPhotos };
+              setEntry(updated);
+              
+              try {
+                const raw = localStorage.getItem('food-journal-v2');
+                if (raw) {
+                  const arr = JSON.parse(raw) as any[];
+                  const ix = arr.findIndex((x) => x.id === entry.id);
+                  if (ix !== -1) {
+                    arr[ix].photos = newPhotos;
+                    localStorage.setItem('food-journal-v2', JSON.stringify(arr));
+                  }
+                }
+              } catch {}
+              setFiles(null);
+              setUploading(false);
+            }
+          };
+          reader.readAsDataURL(f);
+        }
+        return;
       }
     } catch (err) {
       console.error(err);
-      alert('Error subiendo fotos');
-      setUploading(false);
+      alert('Error subiendo fotos: ' + (err as Error).message);
+    } finally {
+      if (supabase) setUploading(false);
     }
   };
 
-  const saveMapsUrl = () => {
+  const saveMapsUrl = async () => {
     if (!entry) return;
     try {
       const updated = { ...entry, maps_url: mapsUrl };
       setEntry(updated);
+      
+      // Update Supabase
+      if (supabase) {
+        await supabase.from('entries').update({ maps_url: mapsUrl }).eq('id', entry.id);
+      }
       
       // Update localStorage
       try {
@@ -133,7 +228,7 @@ export default function EntryClient({ id }: { id: string }) {
     }
   };
 
-  const saveEntryChanges = () => {
+  const saveEntryChanges = async () => {
     if (!entry) return;
     try {
       const updated: Entry = {
@@ -150,6 +245,19 @@ export default function EntryClient({ id }: { id: string }) {
         photos: entry.photos
       };
       setEntry(updated);
+      
+      // Update Supabase
+      if (supabase) {
+        await supabase.from('entries').update({
+          date: updated.date,
+          place: updated.place,
+          city: updated.city,
+          country: updated.country,
+          cuisine: updated.cuisine,
+          service_type: updated.serviceType,
+          notes: updated.notes
+        }).eq('id', updated.id);
+      }
       
       // Update localStorage
       try {
@@ -171,11 +279,18 @@ export default function EntryClient({ id }: { id: string }) {
     }
   };
 
-  const deletePhoto = (index: number) => {
+  const deletePhoto = async (index: number) => {
     if (!entry || !entry.photos) return;
     const newPhotos = entry.photos.filter((_, i) => i !== index);
     const updated = { ...entry, photos: newPhotos };
     setEntry(updated);
+    
+    // Update Supabase
+    if (supabase) {
+      try {
+        await supabase.from('entries').update({ photos: newPhotos }).eq('id', entry.id);
+      } catch (err) { console.warn('Could not update photos in Supabase', err); }
+    }
     
     // Update localStorage
     try {

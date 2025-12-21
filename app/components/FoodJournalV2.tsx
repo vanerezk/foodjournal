@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { supabase } from "../../lib/supabaseClient";
 
 
 
@@ -223,6 +224,47 @@ export default function FoodJournalV2() {
   }, []);
 
   useEffect(() => {
+    // Sync with Supabase on mount
+    let mounted = true;
+    (async () => {
+      if (!supabase) return;
+      try {
+        const { data, error } = await supabase
+          .from('entries')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        if (data && mounted) {
+          const mapped = data.map((e: any) => ({
+            id: e.id,
+            date: e.date,
+            place: e.place,
+            city: e.city,
+            country: e.country,
+            cuisine: e.cuisine,
+            serviceType: e.service_type,
+            notes: e.notes,
+            rating: e.rating,
+            maps_url: e.maps_url,
+            photos: e.photos || []
+          })) as Entry[];
+          
+          setEntries(mapped);
+          // Also update localStorage as backup
+          try {
+            localStorage.setItem('food-journal-v2', JSON.stringify(mapped));
+          } catch {}
+        }
+      } catch (err) {
+        console.warn('Could not load from Supabase, using localStorage:', err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
     // Load persisted active tab
     try {
       const t = localStorage.getItem("food-journal-active-tab");
@@ -259,7 +301,7 @@ export default function FoodJournalV2() {
     setEditingId(null);
   };
 
-  const addOrUpdate = () => {
+  const addOrUpdate = async () => {
     const actualCuisine = cuisine === "Otra" ? (customCuisine.trim() || "Otra") : cuisine;
     if (!place.trim() || !country.trim() || !date) return;
 
@@ -267,9 +309,46 @@ export default function FoodJournalV2() {
       const updated: Entry = { id: editingId, date, place: place.trim(), city: city.trim() || undefined, country: country.trim(), cuisine: actualCuisine, serviceType, notes: notes.trim(), rating: entries.find(e => e.id === editingId)?.rating || "neutral" };
       setEntries((prev) => prev.map((p) => (p.id === editingId ? updated : p)));
       setEditingId(null);
+      
+      // Sync with Supabase
+      if (supabase) {
+        try {
+          await supabase.from('entries').update({
+            date: updated.date,
+            place: updated.place,
+            city: updated.city,
+            country: updated.country,
+            cuisine: updated.cuisine,
+            service_type: updated.serviceType,
+            notes: updated.notes,
+            rating: updated.rating,
+            maps_url: updated.maps_url,
+            photos: updated.photos || []
+          }).eq('id', updated.id);
+        } catch (err) { console.warn('Could not update in Supabase', err); }
+      }
     } else {
       const newEntry: Entry = { id: uid(), date, place: place.trim(), city: city.trim() || undefined, country: country.trim(), cuisine: actualCuisine, serviceType, notes: notes.trim(), rating: "neutral" };
       setEntries((prev) => [newEntry, ...prev]);
+      
+      // Sync with Supabase
+      if (supabase) {
+        try {
+          await supabase.from('entries').insert([{
+            id: newEntry.id,
+            date: newEntry.date,
+            place: newEntry.place,
+            city: newEntry.city,
+            country: newEntry.country,
+            cuisine: newEntry.cuisine,
+            service_type: newEntry.serviceType,
+            notes: newEntry.notes,
+            rating: newEntry.rating,
+            maps_url: newEntry.maps_url,
+            photos: newEntry.photos || []
+          }]);
+        } catch (err) { console.warn('Could not insert into Supabase', err); }
+      }
     }
 
     resetForm();
@@ -292,8 +371,15 @@ export default function FoodJournalV2() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const remove = (id: string) => {
+  const remove = async (id: string) => {
     setEntries((prev) => prev.filter((x) => x.id !== id));
+    
+    // Sync with Supabase
+    if (supabase) {
+      try {
+        await supabase.from('entries').delete().eq('id', id);
+      } catch (err) { console.warn('Could not delete from Supabase', err); }
+    }
   };
 
   const clearAll = () => {
@@ -323,8 +409,15 @@ export default function FoodJournalV2() {
     setToastMessage(null);
   };
 
-  const setRating = (id: string, rating: Rating) => {
+  const setRating = async (id: string, rating: Rating) => {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, rating } : e));
+    
+    // Sync with Supabase
+    if (supabase) {
+      try {
+        await supabase.from('entries').update({ rating }).eq('id', id);
+      } catch (err) { console.warn('Could not update rating in Supabase', err); }
+    }
   };
 
   // Export/Import handlers removed from UI to simplify experience (kept intentionally out).  
