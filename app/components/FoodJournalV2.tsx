@@ -360,7 +360,8 @@ export default function FoodJournalV2() {
       // Sync with Supabase
       if (supabase) {
         try {
-          await supabase.from('entries').insert([{
+          console.log('Supabase inserting:', { id: newEntry.id, place: newEntry.place });
+          const { data, error } = await supabase.from('entries').insert([{
             id: newEntry.id,
             date: newEntry.date,
             place: newEntry.place,
@@ -373,7 +374,14 @@ export default function FoodJournalV2() {
             maps_url: newEntry.maps_url || null,
             photos: newEntry.photos || []
           }]);
-        } catch (err) { console.warn('Could not insert into Supabase', err); }
+          if (error) {
+            console.error('Supabase insert error:', error);
+          } else {
+            console.log('Supabase insert success:', data);
+          }
+        } catch (err) { console.error('Could not insert into Supabase', err); }
+      } else {
+        console.warn('Supabase is null, using localStorage only');
       }
     }
 
