@@ -612,28 +612,28 @@ export default function FoodJournalV2() {
     <div className="card-like">
       <h2 style={{ marginTop: 0 }}>Food Journal 2026</h2>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 14 }}>
-        <div style={{ gridColumn: "span 3" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
+        <div>
           <label style={{ display: "block", marginBottom: 6 }}>Fecha</label>
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{ width: "100%", padding: 10 }} />
         </div>
-        <div style={{ gridColumn: "span 3" }}>
+        <div>
           <label style={{ display: "block", marginBottom: 6 }}>Lugar</label>
           <input value={place} onChange={(e) => setPlace(e.target.value)} placeholder="Nombre del lugar" style={{ width: "100%", padding: 8 }} />
         </div>
-        <div style={{ gridColumn: "span 3" }}>
+        <div>
           <label style={{ display: "block", marginBottom: 6 }}>Ciudad (opcional)</label>
           <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ciudad" style={{ width: "100%", padding: 8 }} />
         </div>
-        <div style={{ gridColumn: "span 3" }}>
+        <div>
           <label style={{ display: "block", marginBottom: 6 }}>País</label>
           <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="País" style={{ width: "100%", padding: 8 }} />
         </div>
 
-        <div style={{ gridColumn: "span 6" }}>
+        <div style={{ gridColumn: "1 / -1" }}>
           <label style={{ display: "block", marginBottom: 6 }}>Tipo de comida</label>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <select value={cuisine} onChange={(e) => setCuisine(e.target.value)} style={{ flex: 1, padding: 8 }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <select value={cuisine} onChange={(e) => setCuisine(e.target.value)} style={{ flex: '1 1 200px', padding: 8 }}>
               {(showAllCuisines ? DEFAULT_CUISINES : DEFAULT_CUISINES.slice(0, 8)).map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
@@ -642,26 +642,26 @@ export default function FoodJournalV2() {
           </div>
         </div>
         {cuisine === "Otra" && (
-          <div style={{ gridColumn: "span 6" }}>
+          <div style={{ gridColumn: "1 / -1" }}>
             <label style={{ display: "block", marginBottom: 6 }}>Especificar tipo</label>
             <input value={customCuisine} onChange={(e) => setCustomCuisine(e.target.value)} placeholder="Ej: Peruana" style={{ width: "100%", padding: 8 }} />
           </div>
         )}
 
-        <div style={{ gridColumn: "span 6" }}>
+        <div style={{ gridColumn: "1 / -1" }}>
           <label style={{ display: "block", marginBottom: 6 }}>Tipo de servicio</label>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button type="button" onClick={() => setServiceType("dine-in")} className={`btn ${serviceType === "dine-in" ? "btn-primary" : "btn-outline-primary"}`}>🍽️ Comer aquí</button>
-            <button type="button" onClick={() => setServiceType("delivery")} className={`btn ${serviceType === "delivery" ? "btn-primary" : "btn-outline-primary"}`}>🚗 Delivery</button>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button type="button" onClick={() => setServiceType("dine-in")} className={`btn ${serviceType === "dine-in" ? "btn-primary" : "btn-outline-primary"}`} style={{ flex: '1 1 140px' }}>🍽️ Comer aquí</button>
+            <button type="button" onClick={() => setServiceType("delivery")} className={`btn ${serviceType === "delivery" ? "btn-primary" : "btn-outline-primary"}`} style={{ flex: '1 1 140px' }}>🚗 Delivery</button>
           </div>
         </div>
 
-        <div style={{ gridColumn: "span 12" }}>
+        <div style={{ gridColumn: "1 / -1" }}>
           <label style={{ display: "block", marginBottom: 6 }}>Notas (opcional)</label>
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Comentario breve" rows={3} style={{ width: "100%", padding: 8 }} />
         </div>
 
-        <div style={{ gridColumn: "span 12", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           <button onClick={addOrUpdate} className="btn btn-primary btn-sm">{editingId ? "Guardar" : "Añadir"}</button>
           <button onClick={resetForm} className="btn btn-secondary btn-sm">Limpiar</button>
 
