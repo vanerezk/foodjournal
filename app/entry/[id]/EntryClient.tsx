@@ -311,13 +311,13 @@ export default function EntryClient({ id }: { id: string }) {
   if (!entry) return (
     <div style={{ padding: 12 }}>
       <p>Entrada no encontrada.</p>
-      <button onClick={() => router.push('/')} className="btn btn-primary">Volver</button>
+      <button onClick={() => router.push('/journal')} className="btn btn-primary">Volver</button>
     </div>
   );
 
   return (
     <div style={{ padding: 12, maxWidth: 800, margin: '0 auto' }}>
-      <button onClick={() => router.push('/')} className="btn btn-outline-secondary mb-3">← Volver</button>
+      <button onClick={() => router.push('/journal')} className="btn btn-outline-secondary mb-3">← Volver</button>
       
       {!isEditing ? (
         <>
