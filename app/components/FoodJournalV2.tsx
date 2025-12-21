@@ -354,7 +354,7 @@ export default function FoodJournalV2() {
         } catch (err) { console.warn('Could not update in Supabase', err); }
       }
     } else {
-      const newEntry: Entry = { id: uid(), date, place: place.trim(), city: city.trim() || undefined, country: country.trim(), cuisine: actualCuisine, serviceType, notes: notes.trim(), rating: "neutral" };
+      const newEntry: Entry = { id: uid(), date, place: place.trim(), city: city.trim() || undefined, country: country.trim(), cuisine: actualCuisine, serviceType, notes: notes.trim(), rating: "neutral", maps_url: undefined, photos: [] };
       setEntries((prev) => [newEntry, ...prev]);
       
       // Sync with Supabase
@@ -370,7 +370,7 @@ export default function FoodJournalV2() {
             service_type: newEntry.serviceType,
             notes: newEntry.notes,
             rating: newEntry.rating,
-            maps_url: newEntry.maps_url,
+            maps_url: newEntry.maps_url || null,
             photos: newEntry.photos || []
           }]);
         } catch (err) { console.warn('Could not insert into Supabase', err); }
