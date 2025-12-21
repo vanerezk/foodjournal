@@ -22,6 +22,20 @@ type Entry = {
   photos?: string[];
 };
 
+
+type DbEntry = {
+  id: string;
+  date: string;
+  place: string;
+  city: string | null;
+  country: string;
+  cuisine: string;
+  service_type: string | null;
+  notes: string | null;
+  rating: string | null;
+  maps_url: string | null;
+  photos: string[] | null;
+};
 const DEFAULT_CUISINES = ["Mexicana", "Italiana", "Japonesa", "China", "India", "Española", "Peruana", "Argentina", "Tailandesa", "Coreana", "Griega", "Turca", "Mediterránea", "Vegetariana", "Vegana", "Francesa", "Americana", "Otra"];
 const COLORS = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#b07aa1", "#ff9da7", "#9c755f"];
 
@@ -237,19 +251,31 @@ export default function FoodJournalV2() {
         if (error) throw error;
         
         if (data && mounted) {
-          const mapped = data.map((e: any) => ({
-            id: e.id,
-            date: e.date,
-            place: e.place,
-            city: e.city,
-            country: e.country,
-            cuisine: e.cuisine,
-            serviceType: e.service_type,
-            notes: e.notes,
-            rating: e.rating,
-            maps_url: e.maps_url,
-            photos: e.photos || []
-          })) as Entry[];
+          const mapped: Entry[] = data.map((e: DbEntry) => {
+            const rating: Rating | undefined =
+              e.rating === 'like' || e.rating === 'neutral' || e.rating === 'dislike'
+                ? e.rating
+                : undefined;
+
+            const serviceType: Entry['serviceType'] =
+              e.service_type === 'dine-in' || e.service_type === 'delivery'
+                ? e.service_type
+                : undefined;
+
+            return {
+              id: e.id,
+              date: e.date,
+              place: e.place,
+              city: e.city || undefined,
+              country: e.country,
+              cuisine: e.cuisine,
+              serviceType,
+              notes: e.notes || undefined,
+              rating,
+              maps_url: e.maps_url || undefined,
+              photos: e.photos || []
+            };
+          });
           
           setEntries(mapped);
           // Also update localStorage as backup

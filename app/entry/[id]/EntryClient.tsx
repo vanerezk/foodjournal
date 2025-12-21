@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -75,7 +76,7 @@ export default function EntryClient({ id }: { id: string }) {
         // Fallback to localStorage
         const raw = localStorage.getItem('food-journal-v2');
         if (raw) {
-          const arr = JSON.parse(raw) as any[];
+          const arr: Entry[] = JSON.parse(raw);
           const found = arr.find((x) => x.id === id);
           if (found && mounted) {
             setEntry(found);
@@ -121,7 +122,7 @@ export default function EntryClient({ id }: { id: string }) {
           const f = files[i];
           const fileName = `${entry.id}/${Date.now()}-${f.name.replace(/[^a-zA-Z0-9.\-]/g, '_')}`;
           
-          const { data, error } = await supabase.storage
+          const { error } = await supabase.storage
             .from('entries')
             .upload(fileName, f, { upsert: false });
           
@@ -147,7 +148,7 @@ export default function EntryClient({ id }: { id: string }) {
         try {
           const raw = localStorage.getItem('food-journal-v2');
           if (raw) {
-            const arr = JSON.parse(raw) as any[];
+            const arr: Entry[] = JSON.parse(raw);
             const ix = arr.findIndex((x) => x.id === entry.id);
             if (ix !== -1) {
               arr[ix].photos = newPhotos;
@@ -174,7 +175,7 @@ export default function EntryClient({ id }: { id: string }) {
               try {
                 const raw = localStorage.getItem('food-journal-v2');
                 if (raw) {
-                  const arr = JSON.parse(raw) as any[];
+                  const arr: Entry[] = JSON.parse(raw);
                   const ix = arr.findIndex((x) => x.id === entry.id);
                   if (ix !== -1) {
                     arr[ix].photos = newPhotos;
@@ -213,7 +214,7 @@ export default function EntryClient({ id }: { id: string }) {
       try {
         const raw = localStorage.getItem('food-journal-v2');
         if (raw) {
-          const arr = JSON.parse(raw) as any[];
+          const arr: Entry[] = JSON.parse(raw);
           const ix = arr.findIndex((x) => x.id === entry.id);
           if (ix !== -1) {
             arr[ix].maps_url = mapsUrl;
@@ -238,7 +239,7 @@ export default function EntryClient({ id }: { id: string }) {
         city: editData.city.trim() || undefined,
         country: editData.country.trim(),
         cuisine: editData.cuisine,
-        serviceType: editData.serviceType as any,
+        serviceType: editData.serviceType as 'dine-in' | 'delivery',
         notes: editData.notes.trim(),
         rating: entry.rating,
         maps_url: entry.maps_url,
@@ -263,7 +264,7 @@ export default function EntryClient({ id }: { id: string }) {
       try {
         const raw = localStorage.getItem('food-journal-v2');
         if (raw) {
-          const arr = JSON.parse(raw) as any[];
+          const arr: Entry[] = JSON.parse(raw);
           const ix = arr.findIndex((x) => x.id === entry.id);
           if (ix !== -1) {
             arr[ix] = updated;
@@ -296,7 +297,7 @@ export default function EntryClient({ id }: { id: string }) {
     try {
       const raw = localStorage.getItem('food-journal-v2');
       if (raw) {
-        const arr = JSON.parse(raw) as any[];
+        const arr: Entry[] = JSON.parse(raw);
         const ix = arr.findIndex((x) => x.id === entry.id);
         if (ix !== -1) {
           arr[ix].photos = newPhotos;
@@ -410,7 +411,7 @@ export default function EntryClient({ id }: { id: string }) {
         </div>
         <div style={{ marginTop: 8 }}>
           <input 
-            ref={(el) => { if (el) (el as any).id = `file-input-${id}`; }}
+            ref={(el) => { if (el) el.id = `file-input-${id}`; }}
             id={`file-input-${id}`}
             type="file" 
             accept="image/*" 
