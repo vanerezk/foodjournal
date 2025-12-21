@@ -610,7 +610,10 @@ export default function FoodJournalV2() {
 
   return (
     <div className="card-like">
-      <h2 style={{ marginTop: 0 }}>Food Journal 2026</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <h2 style={{ marginTop: 0, marginBottom: 8 }}>Food Journal 2026</h2>
+        <Link href="/" className="btn btn-outline-secondary btn-sm">← Volver al home</Link>
+      </div>
 
       <div className="entry-form-grid">
         <div className="form-field-date">
@@ -651,7 +654,7 @@ export default function FoodJournalV2() {
         <div className="form-field-service">
           <label style={{ display: "block", marginBottom: 6 }}>Tipo de servicio</label>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button type="button" onClick={() => setServiceType("dine-in")} className={`btn ${serviceType === "dine-in" ? "btn-primary" : "btn-outline-primary"}`} style={{ flex: '1 1 140px' }}>🍽️ Comer aquí</button>
+            <button type="button" onClick={() => setServiceType("dine-in")} className={`btn ${serviceType === "dine-in" ? "btn-primary" : "btn-outline-primary"}`} style={{ flex: '1 1 140px' }}>🍽️ Dine-In</button>
             <button type="button" onClick={() => setServiceType("delivery")} className={`btn ${serviceType === "delivery" ? "btn-primary" : "btn-outline-primary"}`} style={{ flex: '1 1 140px' }}>🚗 Delivery</button>
           </div>
         </div>
