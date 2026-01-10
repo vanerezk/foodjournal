@@ -36,7 +36,7 @@ type DbEntry = {
   maps_url: string | null;
   photos: string[] | null;
 };
-const DEFAULT_CUISINES = ["Almuerzo", "Americana", "Argentina", "Cena", "China", "Coreana", "Desayuno", "Española", "Francesa", "Griega", "India", "Italiana", "Japonesa", "Mediterránea", "Merienda", "Mexicana", "Otra", "Peruana", "Tailandesa", "Turca", "Vegana", "Vegetariana"];
+const DEFAULT_CUISINES = ["Americana", "Argentina", "China", "Colombiana", "Coreana", "Desayuno", "Española", "Francesa", "Griega", "India", "Italiana", "Japonesa", "Libanesa", "Mediterránea", "Merienda", "Mexicana", "Otra", "Peruana", "Tailandesa", "Tapitas", "Turca", "Vegetariana"];
 const COLORS = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#b07aa1", "#ff9da7", "#9c755f"];
 
 function uid() {
