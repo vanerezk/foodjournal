@@ -19,6 +19,11 @@ type Entry = {
   photos?: string[];
 };
 
+function formatDate(dateString: string): string {
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+}
+
 export default function EntryClient({ id }: { id: string }) {
   const router = useRouter();
   const [entry, setEntry] = useState<Entry | null>(null);
@@ -325,7 +330,7 @@ export default function EntryClient({ id }: { id: string }) {
             <h2>{entry.place}</h2>
             <button onClick={() => setIsEditing(true)} className="btn btn-outline-primary">Editar</button>
           </div>
-          <p><strong>Fecha:</strong> {entry.date}</p>
+          <p><strong>Fecha:</strong> {formatDate(entry.date)}</p>
           <p><strong>Ciudad:</strong> {entry.city || '-'}</p>
           <p><strong>País:</strong> {entry.country}</p>
           <p><strong>Tipo de cocina:</strong> {entry.cuisine}</p>

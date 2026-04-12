@@ -39,6 +39,11 @@ type DbEntry = {
 const DEFAULT_CUISINES = ["Americana", "Argentina", "Buffet", "China", "Colombiana", "Coreana", "Desayuno", "Española", "Francesa", "Griega", "India", "Italiana", "Japonesa", "Libanesa", "Mediterránea", "Merienda", "Mexicana", "Otra", "Peruana", "Tailandesa", "Tapitas", "Turca", "Vegetariana"];
 const COLORS = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#b07aa1", "#ff9da7", "#9c755f"];
 
+function formatDate(dateString: string): string {
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+}
+
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
@@ -246,7 +251,7 @@ export default function FoodJournalV2() {
         const { data, error } = await supabase
           .from('entries')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('date', { ascending: false });
         
         if (error) throw error;
         
@@ -589,7 +594,7 @@ export default function FoodJournalV2() {
               <button type="button" aria-label={"Filtrar por valoración " + e.rating} className={"badge " + (e.rating === 'like' ? 'bg-success' : e.rating === 'dislike' ? 'bg-danger' : 'bg-secondary')} style={{ marginLeft: 8, fontSize: '0.75rem', border: 'none', cursor: 'pointer' }} onClick={() => { setFilterRating(e.rating as Rating); setActiveTab('history'); }}>{e.rating === 'like' ? 'Me gusta' : e.rating === 'neutral' ? 'Neutral' : 'No me gusta'}</button>
             )}
           </div>
-          <div style={{ color: '#444' }}>{e.date} — {e.cuisine}</div>
+          <div style={{ color: '#444' }}>{formatDate(e.date)} — {e.cuisine}</div>
           {e.notes && <div style={{ color: '#666', marginTop: 6 }}>{e.notes}</div>}
         </div>
 
@@ -839,7 +844,7 @@ export default function FoodJournalV2() {
                               <button type="button" aria-label={"Filtrar por valoración " + e.rating} className={"badge " + (e.rating === 'like' ? 'bg-success' : e.rating === 'dislike' ? 'bg-danger' : 'bg-secondary')} style={{ marginLeft: 8, fontSize: '0.75rem', border: 'none', cursor: 'pointer' }} onClick={() => { setFilterRating(e.rating as Rating); setActiveTab('history'); }}>{e.rating === 'like' ? 'Me gusta' : e.rating === 'neutral' ? 'Neutral' : 'No me gusta'}</button>
                             )}
                           </div>
-                          <div style={{ color: '#444' }}>{e.date} — {e.cuisine}</div>
+                          <div style={{ color: '#444' }}>{formatDate(e.date)} — {e.cuisine}</div>
                           {e.notes && <div style={{ color: '#666', marginTop: 6 }}>{e.notes}</div>}
                         </div>
                       </div>
