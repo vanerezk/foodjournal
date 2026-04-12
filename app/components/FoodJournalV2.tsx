@@ -121,13 +121,13 @@ function BarChart({ data, width = 360, height = 160 }: { data: { label: string; 
   const max = Math.max(1, ...sorted.map((d) => d.value));
   const w = width;
   const h = height;
-  const pad = 30;
+  const pad = 40;
   const innerW = w - pad * 2;
-  const innerH = h - 30;
+  const innerH = h - 60;
   const barWidth = Math.max(6, Math.floor(innerW / Math.max(1, sorted.length)) - 6);
 
   return (
-    <div style={{ width: '100%', maxWidth: w }}>
+    <div style={{ width: '100%', maxWidth: w, overflowX: 'auto' }}>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
         {sorted.map((d, i) => {
           const x = pad + i * (barWidth + 6);
@@ -136,7 +136,9 @@ function BarChart({ data, width = 360, height = 160 }: { data: { label: string; 
           return (
             <g key={d.label}>
               <rect x={x} y={y} width={barWidth} height={barH} fill="#4e79a7" rx={4} />
-              <text x={x + barWidth / 2} y={h - pad + 12} fontSize={10} textAnchor="middle" fill="#333">{d.label.length > 8 ? d.label.slice(0, 8) + '…' : d.label}</text>
+              <g transform={`translate(${x + barWidth / 2}, ${h - pad + 8}) rotate(45)`}>
+                <text x={0} y={0} fontSize={9} textAnchor="start" fill="#333">{d.label.length > 12 ? d.label.slice(0, 12) + '…' : d.label}</text>
+              </g>
               <text x={x + barWidth / 2} y={y - 4} fontSize={11} textAnchor="middle" fill="#222">{d.value}</text>
             </g>
           );
